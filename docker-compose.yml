@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  haproxy:
+    build:
+      context: .
+    container_name: "haproxy"
+    tty: true
+    ports:
+      - "5000:80"
+    volumes:
+      - ./haproxy/conf/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+  nginx:
+    image: nginx
+    volumes:
+    - ./nginx/conf/mysite.template:/etc/nginx/conf.d/mysite.template:cached
+    - ./nginx/html:/var/www/html:cached
+    ports:
+    - "5050:80"
+    environment:
+    - NGINX_HOST=localhost
+    - NGINX_PORT=80
+    tty: true
+    command: /bin/bash -c "envsubst '$HOGE' < /etc/nginx/conf.d/mysite.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
+# volumes:
+#   bin:
